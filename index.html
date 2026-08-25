@@ -92,5 +92,9 @@ function resetTheme(){theme={};localStorage.removeItem(TKEY);applyTheme();themeS
 function showStats(){hide();$("stats").classList.remove("hidden");$("statsBox").innerHTML=`<div class="card">🎮 Quizzes played: <b>${stats.played}</b></div><div class="card">🏆 Best score: <b>${stats.best}%</b></div>`}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 applyTheme();home();
+</script><script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js");
+}
 </script>
 </body></html>
