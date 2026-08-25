@@ -1,0 +1,9 @@
+{
+  "name": "QuizVerse",
+  "short_name": "QuizVerse",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#10152b",
+  "theme_color": "#6c63ff",
+  "description": "Make it. Customize it. Play it."
+}
