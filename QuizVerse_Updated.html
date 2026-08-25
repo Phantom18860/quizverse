@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuizVerse</title>
+<style>
+:root{--bg:#10152b;--card:#1b2342;--btn:#6c63ff;--text:#fff;--accent:#ffd166}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:radial-gradient(circle at top,var(--card),var(--bg) 65%);color:var(--text);min-height:100vh;overflow-x:hidden}
+header{text-align:center;padding:30px 15px 10px}h1{font-size:48px;margin:0;text-shadow:0 5px 0 #0004}.sub{opacity:.8}
+main{max-width:900px;margin:auto;padding:20px}.screen{background:#ffffff10;border:1px solid #ffffff18;border-radius:25px;padding:25px;box-shadow:0 15px 40px #0005}
+button{border:0;border-radius:14px;padding:13px 18px;font-size:16px;font-weight:800;cursor:pointer;background:var(--btn);color:white;transition:.15s;box-shadow:0 5px 0 #0004}button:hover{transform:translateY(-3px)}button:active{transform:translateY(2px)}button.secondary{background:#ffffff18}.danger{background:#e05252}
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.big{padding:24px;font-size:20px}
+input,textarea,select{width:100%;padding:12px;border:0;border-radius:12px;background:#fff;color:#111;font:inherit}label{display:block;font-weight:800;margin:14px 0 6px}
+.hidden{display:none!important}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.space{justify-content:space-between}
+.card{background:#ffffff0c;border:1px solid #ffffff18;border-radius:16px;padding:16px;margin:12px 0}
+.question{background:#ffffff0b;border-radius:18px;padding:18px;margin:16px 0}
+.answers{display:grid;gap:10px}.answer{width:100%;text-align:left;background:#fff;color:#172033;box-shadow:none}
+.play-question{animation:danceIn .65s cubic-bezier(.2,1.5,.4,1)}@keyframes danceIn{0%{transform:translateX(-110%) rotate(-8deg);opacity:0}60%{transform:translateX(15%) rotate(5deg);opacity:1}80%{transform:translateX(-5%) rotate(-3deg)}100%{transform:translateX(0) rotate(0)}}
+.pop{animation:pop .35s both}@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.star{position:fixed;pointer-events:none;animation:float 4s infinite ease-in-out;opacity:.5}@keyframes float{50%{transform:translateY(-25px) rotate(20deg)}}
+.score{font-size:70px;font-weight:1000;text-align:center;color:var(--accent)}.center{text-align:center}
+.small{font-size:13px;opacity:.8}
+@media(max-width:600px){.menu{grid-template-columns:1fr}h1{font-size:38px}}
+</style>
+</head>
+<body>
+<div class="star" style="left:7%;top:25%;font-size:30px">⭐</div><div class="star" style="right:8%;top:40%;font-size:25px">✨</div><div class="star" style="left:15%;bottom:15%;font-size:22px">🎈</div>
+<header><h1>🎮 QUIZVERSE 🎮</h1><div class="sub">Make it. Customize it. Play it.</div></header>
+<main>
+<section id="home" class="screen">
+<h2>🏠 Home</h2>
+<div class="menu">
+<button class="big" onclick="newQuiz()">➕ Create Quiz</button>
+<button class="big" onclick="showQuizzes()">✏️ My Quizzes</button>
+<button class="big" onclick="themeScreen()">🎨 Customize</button>
+<button class="big" onclick="showStats()">🏆 My Stats</button>
+</div>
+<div id="homeInfo" class="card center"></div>
+</section>
+
+<section id="list" class="screen hidden"><div class="row space"><h2>📚 My Quizzes</h2><button class="secondary" onclick="home()">🏠 Home</button></div><div id="listBox"></div></section>
+
+<section id="editor" class="screen hidden"><div class="row space"><h2>✏️ Quiz Editor</h2><button class="secondary" onclick="home()">🏠 Home</button></div>
+<label>Quiz name</label><input id="title" placeholder="My Awesome Quiz">
+<div id="qs"></div>
+<div class="row"><button onclick="addQ()">➕ Add Question</button><button onclick="saveQuiz()">💾 Save</button><button class="secondary" onclick="preview()">▶ Preview</button></div></section>
+
+<section id="theme" class="screen hidden"><div class="row space"><h2>🎨 Customize Theme</h2><button class="secondary" onclick="home()">🏠 Home</button></div>
+<label>Background color</label><input id="bg" type="color">
+<label>Card color</label><input id="card" type="color">
+<label>Button color</label><input id="btn" type="color">
+<label>Text color</label><input id="txt" type="color">
+<div class="row" style="margin-top:18px"><button onclick="saveTheme()">💾 Save Theme</button><button class="secondary" onclick="resetTheme()">↩ Reset</button></div></section>
+
+<section id="player" class="screen hidden"><div class="row space"><div><h2 id="pt"></h2><div id="prog" class="small"></div></div><button class="secondary" onclick="home()">Exit</button></div><div id="play"></div></section>
+
+<section id="results" class="screen hidden center"><h2>🎉 Quiz Finished!</h2><div id="score" class="score"></div><p id="result"></p><div class="row" style="justify-content:center"><button onclick="playAgain()">🔄 Again</button><button onclick="shareScore()">📤 Share Score</button><button onclick="exportQuiz()">📦 Share Quiz</button><button class="secondary" onclick="home()">🏠 Home</button></div></section>
+
+<section id="stats" class="screen hidden"><div class="row space"><h2>🏆 My Stats</h2><button class="secondary" onclick="home()">🏠 Home</button></div><div id="statsBox"></div></section>
+</main>
+<script>
+const QKEY="quizverse_quizzes", TKEY="quizverse_theme", SKEY="quizverse_stats";
+let quizzes=JSON.parse(localStorage.getItem(QKEY)||"[]"),theme=JSON.parse(localStorage.getItem(TKEY)||"{}"),stats=JSON.parse(localStorage.getItem(SKEY)||'{"played":0,"best":0}');
+let cur=null,idx=0,points=0;
+const $=id=>document.getElementById(id), uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+function applyTheme(){document.documentElement.style.setProperty("--bg",theme.bg||"#10152b");document.documentElement.style.setProperty("--card",theme.card||"#1b2342");document.documentElement.style.setProperty("--btn",theme.btn||"#6c63ff");document.documentElement.style.setProperty("--text",theme.txt||"#fff")}
+function hide(){["home","list","editor","theme","player","results","stats"].forEach(x=>$(x).classList.add("hidden"))}
+function home(){hide();$("home").classList.remove("hidden");$("homeInfo").innerHTML=`🏆 Best score: <b>${stats.best}%</b> &nbsp; 🎮 Quizzes played: <b>${stats.played}</b>`}
+function newQuiz(){cur={id:uid(),title:"My Quiz",questions:[{id:uid(),text:"What is 2 + 2?",a:["3","4","5","6"],c:1}]};editor()}
+function editor(){hide();$("editor").classList.remove("hidden");$("title").value=cur.title;renderQ()}
+function renderQ(){$("qs").innerHTML=cur.questions.map((q,i)=>`<div class="question"><div class="row space"><h3>Question ${i+1}</h3><button class="danger" onclick="delQ('${q.id}')">🗑 Delete</button></div><label>Question</label><textarea oninput="qtext('${q.id}',this.value)">${esc(q.text)}</textarea><label>Answers (click the radio button for the correct answer)</label>${q.a.map((a,j)=>`<div class="row" style="margin:8px 0"><input style="width:auto" type="radio" name="c${q.id}" ${q.c===j?"checked":""} onchange="setC('${q.id}',${j})"><input oninput="ans('${q.id}',${j},this.value)" value="${esc(a)}"></div>`).join("")}</div>`).join("")}
+function addQ(){cur.questions.push({id:uid(),text:"New question",a:["Answer A","Answer B","Answer C","Answer D"],c:0});renderQ()}
+function delQ(id){if(cur.questions.length===1)return alert("Keep at least one question!");cur.questions=cur.questions.filter(q=>q.id!==id);renderQ()}
+function qtext(id,v){cur.questions.find(q=>q.id===id).text=v}function ans(id,j,v){cur.questions.find(q=>q.id===id).a[j]=v}function setC(id,j){cur.questions.find(q=>q.id===id).c=j}
+function saveQuiz(){cur.title=$("title").value.trim()||"Untitled Quiz";if(cur.questions.some(q=>!q.text.trim()||q.a.some(x=>!x.trim())))return alert("Fill in every question and answer.");let i=quizzes.findIndex(q=>q.id===cur.id);if(i<0)quizzes.push(cur);else quizzes[i]=cur;localStorage.setItem(QKEY,JSON.stringify(quizzes));alert("Saved! 🎉");showQuizzes()}
+function showQuizzes(){hide();$("list").classList.remove("hidden");$("listBox").innerHTML=quizzes.length?quizzes.map(q=>`<div class="card row space"><div><b>${esc(q.title)}</b><div class="small">${q.questions.length} questions</div></div><div class="row"><button onclick="start('${q.id}')">▶ Play</button><button class="secondary" onclick="cur=quizzes.find(x=>x.id==='${q.id}');editor()">✏️ Edit</button><button class="danger" onclick="remove('${q.id}')">🗑</button></div></div>`).join(""):`<p>No quizzes yet! Make one 🎨</p>`}
+function remove(id){if(confirm("Delete this quiz?")){quizzes=quizzes.filter(q=>q.id!==id);localStorage.setItem(QKEY,JSON.stringify(quizzes));showQuizzes()}}
+function preview(){cur.title=$("title").value.trim()||"Preview";startObj()}
+function start(id){cur=quizzes.find(q=>q.id===id);startObj()}
+function startObj(){idx=0;points=0;hide();$("player").classList.remove("hidden");$("pt").textContent=cur.title;renderPlay()}
+function renderPlay(){let q=cur.questions[idx];$("prog").textContent=`Question ${idx+1} of ${cur.questions.length}`;$("play").innerHTML=`<div class="play-question"><h2>💃 ${esc(q.text)} 💃</h2><div class="answers">${q.a.map((x,j)=>`<button class="answer pop" style="animation-delay:${j*.08}s" onclick="choose(${j})">${String.fromCharCode(65+j)}. ${esc(x)}</button>`).join("")}</div></div>`}
+function choose(j){if(j===cur.questions[idx].c)points++;idx++;if(idx<cur.questions.length)renderPlay();else finish()}
+function finish(){stats.played++;let pct=Math.round(points/cur.questions.length*100);stats.best=Math.max(stats.best,pct);localStorage.setItem(SKEY,JSON.stringify(stats));hide();$("results").classList.remove("hidden");$("score").textContent=pct+"%";$("result").textContent=`You got ${points} out of ${cur.questions.length} correct! 🎉`}
+function playAgain(){startObj()}
+function shareScore(){let text=`I scored ${Math.round(points/cur.questions.length*100)}% on "${cur.title}" in QuizVerse! 🎉`;navigator.clipboard?.writeText(text);alert("Score copied! 📋 You can paste it into Gmail or a message.")}
+function exportQuiz(){let data=JSON.stringify(cur);navigator.clipboard?.writeText(data);alert("Quiz data copied! 📋 Send this text to someone, and they can paste/import it in a future version.")}
+function themeScreen(){hide();$("theme").classList.remove("hidden");$("bg").value=theme.bg||"#10152b";$("card").value=theme.card||"#1b2342";$("btn").value=theme.btn||"#6c63ff";$("txt").value=theme.txt||"#ffffff"}
+function saveTheme(){theme={bg:$("bg").value,card:$("card").value,btn:$("btn").value,txt:$("txt").value};localStorage.setItem(TKEY,JSON.stringify(theme));applyTheme();alert("Theme saved! 🎨");home()}
+function resetTheme(){theme={};localStorage.removeItem(TKEY);applyTheme();themeScreen()}
+function showStats(){hide();$("stats").classList.remove("hidden");$("statsBox").innerHTML=`<div class="card">🎮 Quizzes played: <b>${stats.played}</b></div><div class="card">🏆 Best score: <b>${stats.best}%</b></div>`}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+applyTheme();home();
+</script>
+</body></html>
