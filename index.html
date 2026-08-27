@@ -44,6 +44,17 @@ input,textarea,select{width:100%;padding:12px;border:0;border-radius:12px;backgr
   </div>
 
   <div id="homeInfo" class="card center"></div>
+ <div class="card">
+  <h3>⚡ Mini Quizzes</h3>
+  <p>Quick 5-question challenges!</p>
+
+  <div class="menu">
+    <button class="big" onclick="startMiniQuiz('brain')">🧠 Brain Blast</button>
+    <button class="big" onclick="startMiniQuiz('science')">🔬 Science Sprint</button>
+    <button class="big" onclick="startMiniQuiz('math')">➗ Math Rush</button>
+    <button class="big" onclick="startMiniQuiz('world')">🌎 World Explorer</button>
+  </div>
+</div>
 </section>
 
 <section id="list" class="screen hidden"><div class="row space"><h2>📚 My Quizzes</h2><button class="secondary" onclick="home()">🏠 Home</button></div><div id="listBox"></div></section>
