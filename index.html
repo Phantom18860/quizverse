@@ -109,6 +109,110 @@ function resetTheme(){theme={};localStorage.removeItem(TKEY);applyTheme();themeS
 function showStats(){hide();$("stats").classList.remove("hidden");$("statsBox").innerHTML=`<div class="card">🎮 Quizzes played: <b>${stats.played}</b></div><div class="card">🏆 Best score: <b>${stats.best}%</b></div>`}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 applyTheme();home();
+ 
+const miniQuizzes = {
+  brain: {
+    title: "🧠 Brain Blast",
+    questions: [
+      ["What is 5 + 7?", ["10", "11", "12", "13"], 2],
+      ["How many sides does a triangle have?", ["2", "3", "4", "5"], 1],
+      ["Which is the odd one out?", ["Apple", "Banana", "Carrot", "Mango"], 2],
+      ["What comes next: 2, 4, 6, 8, ?", ["9", "10", "11", "12"], 1],
+      ["What is 10 × 10?", ["10", "50", "100", "1000"], 2]
+    ]
+  },
+
+  science: {
+    title: "🔬 Science Sprint",
+    questions: [
+      ["Which planet is known as the Red Planet?", ["Earth", "Mars", "Venus", "Jupiter"], 1],
+      ["What gas do humans need to breathe?", ["Oxygen", "Helium", "Neon", "Hydrogen"], 0],
+      ["How many legs does an insect have?", ["4", "6", "8", "10"], 1],
+      ["What force pulls objects toward Earth?", ["Gravity", "Friction", "Magnetism", "Sound"], 0],
+      ["What is H₂O?", ["Salt", "Water", "Oxygen", "Carbon dioxide"], 1]
+    ]
+  },
+
+  math: {
+    title: "➗ Math Rush",
+    questions: [
+      ["What is 7 + 8?", ["13", "14", "15", "16"], 2],
+      ["What is 9 × 6?", ["45", "54", "63", "72"], 1],
+      ["What is 100 ÷ 4?", ["20", "25", "30", "40"], 1],
+      ["What is 12 − 5?", ["5", "6", "7", "8"], 2],
+      ["What is 5 × 5 + 5?", ["25", "30", "35", "40"], 1]
+    ]
+  },
+
+  world: {
+    title: "🌎 World Explorer",
+    questions: [
+      ["What is the capital of France?", ["Paris", "Rome", "Madrid", "Berlin"], 0],
+      ["Which is the largest ocean?", ["Atlantic", "Indian", "Pacific", "Arctic"], 2],
+      ["Which continent is Egypt in?", ["Asia", "Africa", "Europe", "Australia"], 1],
+      ["What is the capital of Japan?", ["Seoul", "Beijing", "Tokyo", "Bangkok"], 2],
+      ["Which country is famous for the pyramids of Giza?", ["Egypt", "Brazil", "Canada", "Spain"], 0]
+    ]
+  }
+};
+
+let miniType = "";
+let miniIndex = 0;
+let miniScore = 0;
+
+function startMiniQuiz(type) {
+  miniType = type;
+  miniIndex = 0;
+  miniScore = 0;
+  showMiniQuestion();
+}
+
+function showMiniQuestion() {
+  const quiz = miniQuizzes[miniType];
+  const q = quiz.questions[miniIndex];
+
+  hide();
+  $("player").classList.remove("hidden");
+  $("pt").textContent = quiz.title;
+  $("prog").textContent = `Question ${miniIndex + 1} of ${quiz.questions.length}`;
+
+  $("play").innerHTML = `
+    <div class="play-question">
+      <h2>💃 ${esc(q[0])} 💃</h2>
+      <div class="answers">
+        ${q[1].map((answer,j)=>
+          `<button class="answer pop" onclick="answerMini(${j})">${String.fromCharCode(65+j)}. ${esc(answer)}</button>`
+        ).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function answerMini(choice) {
+  const quiz = miniQuizzes[miniType];
+  const q = quiz.questions[miniIndex];
+
+  if (choice === q[2]) miniScore++;
+
+  miniIndex++;
+
+  if (miniIndex < quiz.questions.length) {
+    showMiniQuestion();
+  } else {
+    finishMiniQuiz();
+  }
+}
+
+function finishMiniQuiz() {
+  const quiz = miniQuizzes[miniType];
+  const pct = Math.round(miniScore / quiz.questions.length * 100);
+
+  hide();
+  $("results").classList.remove("hidden");
+  $("score").textContent = pct + "%";
+  $("result").textContent =
+    `You got ${miniScore} out of ${quiz.questions.length} correct! 🎉`;
+}
 </script><script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
