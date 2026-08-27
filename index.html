@@ -30,14 +30,20 @@ input,textarea,select{width:100%;padding:12px;border:0;border-radius:12px;backgr
 <header><h1>🎮 QUIZVERSE 🎮</h1><div class="sub">Make it. Customize it. Play it.</div></header>
 <main>
 <section id="home" class="screen">
-<h2>🏠 Home</h2>
-<div class="menu">
-<button class="big" onclick="newQuiz()">➕ Create Quiz</button>
-<button class="big" onclick="showQuizzes()">✏️ My Quizzes</button>
-<button class="big" onclick="themeScreen()">🎨 Customize</button>
-<button class="big" onclick="showStats()">🏆 My Stats</button>
-</div>
-<div id="homeInfo" class="card center"></div>
+  <div class="center pop">
+    <div style="font-size:70px">🎮</div>
+    <h2 style="font-size:42px;margin:5px 0">QUIZVERSE</h2>
+    <p class="sub">Make it. Customize it. Play it.</p>
+  </div>
+
+  <div class="menu">
+    <button class="big" onclick="newQuiz()">➕ Create Quiz</button>
+    <button class="big" onclick="showQuizzes()">📚 My Quizzes</button>
+    <button class="big" onclick="themeScreen()">🎨 Customize</button>
+    <button class="big" onclick="showStats()">🏆 My Stats</button>
+  </div>
+
+  <div id="homeInfo" class="card center"></div>
 </section>
 
 <section id="list" class="screen hidden"><div class="row space"><h2>📚 My Quizzes</h2><button class="secondary" onclick="home()">🏠 Home</button></div><div id="listBox"></div></section>
